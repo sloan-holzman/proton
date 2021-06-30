@@ -21,8 +21,8 @@ const getBlobStoreIDsWithBadCounts = async (db) => {
 
 const updateBlobReferenceCounts = async ({ db, countByBlobStorageId }) => {
   try {
-    await db.query('START TRANSACTION');
     const startedAt = new Date();
+    await db.query('START TRANSACTION');
     await db.query('delete from BlobReferenceCount');
     if (!_.isEmpty(countByBlobStorageId)) {
       await db.query(`insert into BlobReferenceCount (BlobStorageID, NumReferences) values ${Object.entries(countByBlobStorageId).map(([BlobStorageID, NumReferences]) => `(${BlobStorageID}, ${NumReferences})`).join(', ')}`);
@@ -45,6 +45,12 @@ const updateBlobReferenceCountsIfNecessary = async ({ db, countByBlobStorageId }
 const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId, attempt = 0 }) => {
   try {
     await updateBlobReferenceCountsIfNecessary({ db, countByBlobStorageId });
+    /* TODO:
+        for increased resiliency, for three queries below
+        I could save most recent result of query in DB,
+        only query if last query was outside of time limit,
+        and add try/catch recursion for multiple attempts if there is a failure
+     */
     const [
       orphanBlobStorageIDs,
       missingBlobStorageIDs,
