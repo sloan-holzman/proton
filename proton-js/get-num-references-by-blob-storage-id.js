@@ -24,7 +24,7 @@ const getAndSaveCountByBlobStorageId = async ({ referenceRow, db }) => {
   }
 };
 
-const getNumReferencesByBlobStorageId = db => async (referenceRow) => {
+const getNumReferencesByBlobStorageId = async ({ db, referenceRow }) => {
   const { endedAt, countByBlobStorageID } = referenceRow;
   try {
     if (isWithinTimeLimit(endedAt)) {

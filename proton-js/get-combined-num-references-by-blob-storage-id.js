@@ -8,8 +8,7 @@ const getReferencingTablesToQuery = db => db.query('select * from TableReference
 const getCombinedNumReferencesByBlobStorageId = async ({ db, attempt = 0 }) => {
   try {
     const referencesToQuery = await getReferencingTablesToQuery(db);
-    const getCountByStorageIdFromReferencesRow = getNumReferencesByBlobStorageId(db);
-    const countsByBlobStorageId = await Promise.all(referencesToQuery.map(getCountByStorageIdFromReferencesRow));
+    const countsByBlobStorageId = await Promise.all(referencesToQuery.map(referenceRow => getNumReferencesByBlobStorageId({ db, referenceRow })));
     const failedQueries = countsByBlobStorageId.filter(count => !count.succeeded);
     if (!failedQueries.length) {
       await db.release();
