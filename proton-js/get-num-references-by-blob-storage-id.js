@@ -33,7 +33,7 @@ const getNumReferencesByBlobStorageId = db => async (referenceRow) => {
     const countByBlobStorageId = await getAndSaveCountByBlobStorageId({ referenceRow, db });
     return { succeeded: true, result: countByBlobStorageId, referenceRow };
   } catch (err) {
-    console.error(`Error blah for ${referenceRow.columnName}, ${referenceRow.tableName}`, err);
+    console.error(`Error querying for BlobStorageID references for ${referenceRow.columnName}, ${referenceRow.tableName}`, err);
     return { succeeded: false, referenceRow };
   }
 };
