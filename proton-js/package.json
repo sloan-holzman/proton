@@ -2,7 +2,7 @@
   "name": "proton-js",
   "version": "1.0.0",
   "description": "take home dev assignment",
-  "main": "db.js",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=local nodemon --inspect-brk=8001 index.js",
