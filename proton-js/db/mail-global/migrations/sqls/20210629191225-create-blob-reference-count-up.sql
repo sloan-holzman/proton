@@ -1,19 +1,24 @@
 create table if not exists BlobReferenceCount (
     BlobStorageID bigint(20) PRIMARY KEY not null,
-    NumReferences bigint(20) not null,
-    UpdatedAt timestamp default now()
+    NumReferences bigint(20) not null
 );
 
-create table if not exists BlobReferenceCron (
+create table if not exists BlobReferenceCountRuns (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    TableName varchar(255) not null,
-    ColumnName varchar(255) not null,
-    StartedAt timestamp null default null,
-    EndedAt timestamp null default null,
-    CountByBlobStorageID LONGTEXT null default null,
-    UNIQUE KEY BlobReferenceCronTableColumn(TableName, ColumnName)
+    startedAt timestamp null default null,
+    endedAt timestamp null default null
 );
 
-insert into BlobReferenceCron (TableName, ColumnName) values
+create table if not exists TableReferencesToBlobStorageID (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tableName varchar(255) not null,
+    columnName varchar(255) not null,
+    startedAt timestamp null default null,
+    endedAt timestamp null default null,
+    countByBlobStorageID LONGTEXT null default null,
+    UNIQUE KEY TableReferencesToBlobStorageIDTableColumn(tableName, columnName)
+);
+
+insert into TableReferencesToBlobStorageID (tableName, columnName) values
 ('SentMessage', 'BlobStorageID'),
 ('SentAttachment', 'BlobStorageID');

@@ -1,14 +1,14 @@
-create table if not exists BlobReferenceCron (
+create table if not exists TableReferencesToBlobStorageID (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    TableName varchar(255) not null,
-    ColumnName varchar(255) not null,
-    StartedAt timestamp null default null,
-    EndedAt timestamp null default null,
-    CountByBlobStorageID LONGTEXT null default null,
-    UNIQUE KEY BlobReferenceCronTableColumn(TableName, ColumnName)
+    tableName varchar(255) not null,
+    columnName varchar(255) not null,
+    startedAt timestamp null default null,
+    endedAt timestamp null default null,
+    countByBlobStorageID LONGTEXT null default null,
+    UNIQUE KEY TableReferencesToBlobStorageIDTableColumn(tableName, columnName)
 );
 
-insert into BlobReferenceCron (TableName, ColumnName) values
+insert into TableReferencesToBlobStorageID (tableName, columnName) values
 ('Attachment', 'BlobStorageID'),
 ('OutsideAttachment', 'BlobStorageID'),
 ('ContactData', 'BlobStorageID'),

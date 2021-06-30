@@ -11,9 +11,9 @@ const isWithinTimeLimit = (date) => {
   return elapsedTimeInMilliseconds < timeLimitInMilliseconds;
 };
 const mergeCountFn = (countA, countB) => (countA || 0) + (countB || 0);
-const mergeCountsByBlogStorageId = countsByBlogStorageId => _.mergeWith({}, ...countsByBlogStorageId, mergeCountFn);
+const mergeCountsByBlobStorageId = countsByBlobStorageId => _.mergeWith({}, ...countsByBlobStorageId, mergeCountFn);
 
-const mapBlogStorageIdToCountByBlogStorageID = references => references.reduce((acc, reference) => {
+const mapBlobStorageIdToCountByBlobStorageID = references => references.reduce((acc, reference) => {
   const { blobStorageId, numReferences } = reference;
   acc[blobStorageId] = numReferences;
   return acc;
@@ -22,6 +22,6 @@ const mapBlogStorageIdToCountByBlogStorageID = references => references.reduce((
 
 module.exports = {
   isWithinTimeLimit,
-  mergeCountsByBlogStorageId,
-  mapBlogStorageIdToCountByBlogStorageID,
+  mergeCountsByBlobStorageId,
+  mapBlobStorageIdToCountByBlobStorageID,
 };

@@ -1,1 +1,1 @@
-drop table if exists BlobReferenceCron;
+drop table if exists TableReferencesToBlobStorageID;

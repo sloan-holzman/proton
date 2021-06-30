@@ -1,22 +1,22 @@
-const { DB_PROTON_MAIL_SHARD, DB_PROTON_MAIL_GLOBAL } = require('./config');
+const { db } = require('./config');
 const { connection } = require('./db');
-const { mergeCountsByBlogStorageId } = require('./utils');
-const { getBadReferencesByType } = require('./get-bad-references-by-type')
-const { getCombinedCountByBlogStorageId } = require('./get-combined-count-by-blog-storage-id')
+const { mergeCountsByBlobStorageId } = require('./utils');
+const { getBlobStorageIdInconsistenciesByType } = require('./get-blob-storage-id-inconsistencies-by-type');
+const { getCombinedReferenceCountsByBlobStorageId } = require('./get-combined-count-by-blob-storage-id');
 
-const doItAll = async () => {
-  const sharedCountByBlogStorageId = await getCombinedCountByBlogStorageId({ db: await connection(DB_PROTON_MAIL_SHARD) });
-  const globalCountByBlogStorageId = await getCombinedCountByBlogStorageId({ db: await connection(DB_PROTON_MAIL_GLOBAL) });
-  const countByBlogStorageId = mergeCountsByBlogStorageId([
-    sharedCountByBlogStorageId,
-    globalCountByBlogStorageId,
+const identifyDataInconsistencies = async () => {
+  const sharedCountByBlobStorageId = await getCombinedReferenceCountsByBlobStorageId({ db: await connection(db.DB_PROTON_MAIL_SHARD) });
+  const globalCountByBlobStorageId = await getCombinedReferenceCountsByBlobStorageId({ db: await connection(db.DB_PROTON_MAIL_GLOBAL) });
+  const countByBlobStorageId = mergeCountsByBlobStorageId([
+    sharedCountByBlobStorageId,
+    globalCountByBlobStorageId,
   ]);
-  return getBadReferencesByType({
-    db: await connection(DB_PROTON_MAIL_GLOBAL),
-    countByBlogStorageId,
+  return getBlobStorageIdInconsistenciesByType({
+    db: await connection(db.DB_PROTON_MAIL_GLOBAL),
+    countByBlobStorageId,
   });
 };
 
-doItAll().then(() => {
-  console.log('success!');
+identifyDataInconsistencies().then((result) => {
+  console.log('BadReferencesByType', result);
 });
