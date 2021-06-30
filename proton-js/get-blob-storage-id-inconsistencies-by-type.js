@@ -49,7 +49,8 @@ const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId,
         for increased resiliency, for three queries below
         I could save most recent result of query in DB,
         only query if last query was outside of time limit,
-        and add try/catch recursion for multiple attempts if there is a failure
+        and add try/catch recursion for multiple attempts if there is a failure.
+        see 'getNumReferencesByBlobStorageId' as an example
      */
     const [
       orphanBlobStorageIDs,

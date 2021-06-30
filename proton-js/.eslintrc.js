@@ -4,14 +4,11 @@ module.exports = {
     "linebreak-style": 0,
     "no-underscore-dangle": "off"
   },
-  "env": {
-    "mocha": true
-  },
   "overrides": [
       {
         "files": ["*.spec.js"],
         "rules": {
-            "no-unused-expressions": "off"
+            "no-undef": "off",
         }
       }
   ]
