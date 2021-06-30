@@ -32,4 +32,5 @@ npm run start
 ## Outstanding TODOs
 
 1. Increase test coverage, particularly for database queries
-2. Update ```getBlobStorageIdInconsistenciesByType``` to save results of each of the three sub-queries along with a timestamp, then only run each sub-query if the last run was outside of a set time bound, and add try/catch blocks with possible retries.  In other words, follow pattern established in ``getNumReferencesByBlobStorageId``.
+2. Confirm casing for database tables and columns (snake_case, upper CamelCase, lower camelCase)
+3. Update ```getBlobStorageIdInconsistenciesByType``` to save results of each of the three sub-queries along with a timestamp, then only run each sub-query if the last run was outside of a set time bound, and add try/catch blocks with possible retries.  In other words, follow pattern established in ``getNumReferencesByBlobStorageId``.
