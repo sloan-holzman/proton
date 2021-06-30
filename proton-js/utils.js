@@ -16,7 +16,7 @@ const mergeCountFn = (countA, countB) => (countA || 0) + (countB || 0);
 
 const mergeCountsByBlobStorageId = countsByBlobStorageId => _.mergeWith({}, ...countsByBlobStorageId, mergeCountFn);
 
-const mapRowToCountByBlobStorageID = references => references.reduce((acc, reference) => {
+const mapRowsToCountByBlobStorageID = numReferencesToEachBlogStorageID => numReferencesToEachBlogStorageID.reduce((acc, reference) => {
   const { blobStorageId, numReferences } = reference;
   acc[blobStorageId] = numReferences;
   return acc;
@@ -26,5 +26,5 @@ const mapRowToCountByBlobStorageID = references => references.reduce((acc, refer
 module.exports = {
   isWithinTimeLimit,
   mergeCountsByBlobStorageId,
-  mapRowToCountByBlobStorageID,
+  mapRowsToCountByBlobStorageID,
 };

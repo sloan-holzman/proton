@@ -3,6 +3,7 @@ const { getNumReferencesByBlobStorageId } = require('./get-num-references-by-blo
 const { mergeCountsByBlobStorageId } = require('./utils');
 const { MAX_ATTEMPTS } = require('./constants');
 
+// returns a row for each tables/column combination that reference BlobStorageID, as well the most recent query result against each combination
 const getReferencingTablesToQuery = db => db.query('select * from TableReferencesToBlobStorageID');
 
 const getCombinedNumReferencesByBlobStorageId = async ({ db, attempt = 0 }) => {

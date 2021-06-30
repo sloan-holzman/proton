@@ -1,7 +1,7 @@
 const {
   isWithinTimeLimit,
   mergeCountsByBlobStorageId,
-  mapRowToCountByBlobStorageID,
+  mapRowsToCountByBlobStorageID,
 } = require('../utils');
 
 describe('utils', () => {
@@ -41,10 +41,10 @@ describe('utils', () => {
     });
   });
 
-  describe('mapRowToCountByBlobStorageID', () => {
+  describe('mapRowsToCountByBlobStorageID', () => {
     it('successfully maps reference rows to a dictionary', () => {
       expect(
-        mapRowToCountByBlobStorageID([
+        mapRowsToCountByBlobStorageID([
           { blobStorageId: 1, numReferences: 2 },
           { blobStorageId: 3, numReferences: 2 },
         ]),

@@ -1,4 +1,4 @@
-const { isWithinTimeLimit, mapRowToCountByBlobStorageID } = require('./utils');
+const { isWithinTimeLimit, mapRowsToCountByBlobStorageID } = require('./utils');
 
 const getNumReferencesGroupedByBlobStorageID = ({ referenceRow, db }) => db.query(`select ${referenceRow.columnName} as "blobStorageId", count(${referenceRow.columnName}) as "numReferences" from ${referenceRow.tableName} group by ${referenceRow.columnName}`);
 const updateTableReferencesToBlobStorageIDStartedAt = ({ referenceRow, db }) => db.query('update TableReferencesToBlobStorageID set startedAt = now() where columnName = ? and tableName = ?', [referenceRow.columnName, referenceRow.tableName]);
@@ -11,8 +11,8 @@ const getAndSaveCountByBlobStorageId = async ({ referenceRow, db }) => {
   try {
     await db.query('START TRANSACTION');
     await updateTableReferencesToBlobStorageIDStartedAt({ referenceRow, db });
-    const references = await getNumReferencesGroupedByBlobStorageID({ referenceRow, db });
-    const countByBlobStorageId = mapRowToCountByBlobStorageID(references);
+    const numReferencesToEachBlogStorageID = await getNumReferencesGroupedByBlobStorageID({ referenceRow, db });
+    const countByBlobStorageId = mapRowsToCountByBlobStorageID(numReferencesToEachBlogStorageID);
     await updateTableReferencesToBlobStorageIDCountById({
       referenceRow, countByBlobStorageId, db,
     });
@@ -25,15 +25,15 @@ const getAndSaveCountByBlobStorageId = async ({ referenceRow, db }) => {
 };
 
 const getNumReferencesByBlobStorageId = async ({ db, referenceRow }) => {
-  const { endedAt, countByBlobStorageID } = referenceRow;
+  const { endedAt, countByBlobStorageID, columnName, tableName } = referenceRow;
   try {
     if (isWithinTimeLimit(endedAt)) {
       return { succeeded: true, result: JSON.parse(countByBlobStorageID), referenceRow };
     }
-    const countByBlobStorageId = await getAndSaveCountByBlobStorageId({ referenceRow, db });
-    return { succeeded: true, result: countByBlobStorageId, referenceRow };
+    const updatedCountByBlogStorageID = await getAndSaveCountByBlobStorageId({ referenceRow, db });
+    return { succeeded: true, result: updatedCountByBlogStorageID, referenceRow };
   } catch (err) {
-    console.error(`Error querying for BlobStorageID references for ${referenceRow.columnName}, ${referenceRow.tableName}`, err);
+    console.error(`Error querying for BlobStorageID references for ${columnName}, ${tableName}`, err);
     return { succeeded: false, referenceRow };
   }
 };
