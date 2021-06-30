@@ -1,0 +1,26 @@
+{
+  "name": "proton-js",
+  "version": "1.0.0",
+  "description": "take home dev assignment",
+  "main": "db.js",
+  "scripts": {
+    "start": "node index.js",
+    "local": "NODE_ENV=local nodemon --inspect-brk=8001 index.js",
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "db-migrate": "^0.11.12",
+    "db-migrate-mysql": "^2.1.2",
+    "dotenv": "^10.0.0",
+    "lodash": "^4.17.21",
+    "mysql": "^2.18.1",
+    "util": "^0.12.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.2"
+  }
+}
