@@ -24,8 +24,10 @@ const getAndSaveCountByBlobStorageId = async ({ referenceRow, db }) => {
   }
 };
 
-const getNumReferencesByBlobStorageId = async ({ db, referenceRow }) => {
-  const { endedAt, countByBlobStorageID, columnName, tableName } = referenceRow;
+const getNumReferencesByBlobStorageID = async ({ db, referenceRow }) => {
+  const {
+    endedAt, countByBlobStorageID, columnName, tableName,
+  } = referenceRow;
   try {
     if (isWithinTimeLimit(endedAt)) {
       return { succeeded: true, result: JSON.parse(countByBlobStorageID), referenceRow };
@@ -39,5 +41,5 @@ const getNumReferencesByBlobStorageId = async ({ db, referenceRow }) => {
 };
 
 module.exports = {
-  getNumReferencesByBlobStorageId,
+  getNumReferencesByBlobStorageID,
 };

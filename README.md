@@ -33,4 +33,5 @@ npm run start
 
 1. Increase test coverage, particularly for database queries
 2. Confirm casing for database tables and columns (snake_case, upper CamelCase, lower camelCase)
-3. Update ```getBlobStorageIdInconsistenciesByType``` to save results of each of the three sub-queries along with a timestamp, then only run each sub-query if the last run was outside of a set time bound, and add try/catch blocks with possible retries.  In other words, follow pattern established in ``getNumReferencesByBlobStorageId``.
+3. Abstract out max_attempts/retry logic to make it generically reusable (e.g. in ``getBlobStorageIdInconsistenciesByType`` and ``getCombinedNumReferencesByBlobStorageId`` and the sub-queries within ```getBlobStorageIdInconsistenciesByType```)
+4. Update ```getBlobStorageIdInconsistenciesByType``` to save results of each of the three sub-queries along with a timestamp, then only run each sub-query if the last run was outside of a set time bound, and add try/catch blocks with possible retries.  In other words, follow pattern established in ``getNumReferencesByBlobStorageID``, but using the to be abstracted out retry logic function (see TODO #3).

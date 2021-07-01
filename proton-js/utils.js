@@ -3,7 +3,7 @@ const { ACCEPTABLE_TIME_LIMIT_IN_MINUTES } = require('./constants');
 
 const timeLimitInMilliseconds = 1000 * 60 * ACCEPTABLE_TIME_LIMIT_IN_MINUTES;
 
-// TODO: add tests and checks that date is a valid data
+// TODO: add tests to check that date is a valid data
 const isWithinTimeLimit = (date) => {
   if (!date) {
     return false;

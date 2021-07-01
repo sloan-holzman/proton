@@ -2,21 +2,23 @@ const _ = require('lodash');
 const { MAX_ATTEMPTS } = require('./constants');
 const { isWithinTimeLimit } = require('./utils');
 
+const mapForBlobStorageID = rows => rows.map(row => row.BlobStorageID);
+
 const getMostRecentReferenceCountUpdate = db => db.query('select * from BlobReferenceCountRuns order by endedAt desc limit 1');
 
 const getOrphanBlobStorageIDs = async (db) => {
   const orphanBlobStorageIDs = await db.query('select BlobStorageID from BlobStorage where BlobStorageID not in (select BlobStorageID from BlobReferenceCount) and NumReferences > 0');
-  return _.map(orphanBlobStorageIDs, 'BlobStorageID');
+  return mapForBlobStorageID(orphanBlobStorageIDs);
 };
 
 const getMissingBlobStorageIDs = async (db) => {
   const missingBlobStorageIDs = await db.query('select BlobStorageID from BlobReferenceCount where BlobStorageID not in (select BlobStorageID from BlobStorage)');
-  return _.map(missingBlobStorageIDs, 'BlobStorageID');
+  return mapForBlobStorageID(missingBlobStorageIDs);
 };
 
 const getBlobStoreIDsWithBadCounts = async (db) => {
   const blobStoreIDsWithBadCounts = await db.query('select BlobStorage.BlobStorageId from BlobStorage join BlobReferenceCount on BlobStorage.BlobStorageId = BlobReferenceCount.BlobStorageId where BlobStorage.BlobStorageId != BlobReferenceCount.BlobStorageId');
-  return _.map(blobStoreIDsWithBadCounts, 'BlobStorageID');
+  return mapForBlobStorageID(blobStoreIDsWithBadCounts);
 };
 
 const updateBlobReferenceCounts = async ({ db, countByBlobStorageId }) => {
@@ -25,7 +27,10 @@ const updateBlobReferenceCounts = async ({ db, countByBlobStorageId }) => {
     await db.query('START TRANSACTION');
     await db.query('delete from BlobReferenceCount');
     if (!_.isEmpty(countByBlobStorageId)) {
-      await db.query(`insert into BlobReferenceCount (BlobStorageID, NumReferences) values ${Object.entries(countByBlobStorageId).map(([BlobStorageID, NumReferences]) => `(${BlobStorageID}, ${NumReferences})`).join(', ')}`);
+      const values = Object.entries(countByBlobStorageId)
+        .map(([BlobStorageID, NumReferences]) => `(${BlobStorageID}, ${NumReferences})`)
+        .join(', ');
+      await db.query(`insert into BlobReferenceCount (BlobStorageID, NumReferences) values ${values}`);
     }
     await db.query('insert into BlobReferenceCountRuns (startedAt, endedAt) values (?, now())', [startedAt]);
     await db.query('COMMIT');
@@ -42,6 +47,7 @@ const updateBlobReferenceCountsIfNecessary = async ({ db, countByBlobStorageId }
   }
 };
 
+// TODO: abstract out max_attempts/retry logic to make it generically reusable
 const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId, attempt = 0 }) => {
   try {
     await updateBlobReferenceCountsIfNecessary({ db, countByBlobStorageId });
@@ -50,7 +56,7 @@ const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId,
         I could save most recent result of query in DB,
         only query if last query was outside of time limit,
         and add try/catch recursion for multiple attempts if there is a failure.
-        see 'getNumReferencesByBlobStorageId' as an example
+        see 'getNumReferencesByBlobStorageID' as an example
      */
     const [
       orphanBlobStorageIDs,
@@ -61,7 +67,6 @@ const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId,
       getMissingBlobStorageIDs(db),
       getBlobStoreIDsWithBadCounts(db),
     ]);
-    await db.release();
     return {
       orphanBlobStorageIDs,
       missingBlobStorageIDs,
@@ -75,8 +80,9 @@ const getBlobStorageIdInconsistenciesByType = async ({ db, countByBlobStorageId,
         attempt: attempt + 1,
       });
     }
-    await db.release();
     throw err;
+  } finally {
+    await db.release();
   }
 };
 

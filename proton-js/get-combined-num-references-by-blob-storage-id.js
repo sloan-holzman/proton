@@ -1,28 +1,35 @@
-const _ = require('lodash');
-const { getNumReferencesByBlobStorageId } = require('./get-num-references-by-blob-storage-id');
+const { getNumReferencesByBlobStorageID } = require('./get-num-references-by-blob-storage-id');
 const { mergeCountsByBlobStorageId } = require('./utils');
 const { MAX_ATTEMPTS } = require('./constants');
 
-// returns a row for each tables/column combination that reference BlobStorageID, as well the most recent query result against each combination
+// returns a row for each tables/column combination that reference BlobStorageID,
+// as well the most recent query result against each combination
 const getReferencingTablesToQuery = db => db.query('select * from TableReferencesToBlobStorageID');
 
+// TODO: abstract out max_attempts/retry logic to make it generically reusable
 const getCombinedNumReferencesByBlobStorageId = async ({ db, attempt = 0 }) => {
   try {
     const referencesToQuery = await getReferencingTablesToQuery(db);
-    const countsByBlobStorageId = await Promise.all(referencesToQuery.map(referenceRow => getNumReferencesByBlobStorageId({ db, referenceRow })));
+    const countsByBlobStorageId = await Promise.all(
+      referencesToQuery
+        .map(referenceRow => getNumReferencesByBlobStorageID({ db, referenceRow })),
+    );
     const failedQueries = countsByBlobStorageId.filter(count => !count.succeeded);
     if (!failedQueries.length) {
-      await db.release();
-      return mergeCountsByBlobStorageId(_.map(countsByBlobStorageId, 'result'));
+      const mappedResults = countsByBlobStorageId.map(count => count.result);
+      return mergeCountsByBlobStorageId(mappedResults);
     }
     if (attempt <= MAX_ATTEMPTS) {
       return getCombinedNumReferencesByBlobStorageId({ db, attempt: attempt + 1 });
     }
-    const failingCombinations = failedQueries.map(failedQuery => `tableName: ${failedQuery.referenceRow.tableName} / columnName: ${failedQuery.referenceRow.columnName}`).join(', ');
+    const failingCombinations = failedQueries
+      .map(failedQuery => `tableName: ${failedQuery.referenceRow.tableName} / columnName: ${failedQuery.referenceRow.columnName}`)
+      .join(', ');
     throw new Error(`Unable to complete process for the following tables/columns: ${failingCombinations}`);
   } catch (err) {
-    await db.release();
     throw err;
+  } finally {
+    await db.release();
   }
 };
 

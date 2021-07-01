@@ -1,6 +1,7 @@
 // NOTE: the below code was adapted from https://medium.com/wenchin-rolls-around/example-of-using-transactions-with-async-await-via-mysql-connection-pool-9a37092f226f
 const mysql = require('mysql');
 const { db } = require('../config');
+const { GLOBAL, SHARD } = require('../constants')
 
 const {
   DB_USER, DB_PASSWORD, DB_HOST, DB_POOL_LIMIT, DB_PROTON_MAIL_SHARD, DB_PROTON_MAIL_GLOBAL,
@@ -14,8 +15,8 @@ const dbConfig = {
 };
 
 const pools = {
-  [DB_PROTON_MAIL_SHARD]: mysql.createPool({ ...dbConfig, database: DB_PROTON_MAIL_SHARD }),
-  [DB_PROTON_MAIL_GLOBAL]: mysql.createPool({ ...dbConfig, database: DB_PROTON_MAIL_GLOBAL }),
+  [SHARD]: mysql.createPool({ ...dbConfig, database: DB_PROTON_MAIL_SHARD }),
+  [GLOBAL]: mysql.createPool({ ...dbConfig, database: DB_PROTON_MAIL_GLOBAL }),
 };
 
 // simply function to 'promisify' getting connections and making queries
