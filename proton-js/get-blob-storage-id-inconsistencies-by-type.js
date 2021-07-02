@@ -17,7 +17,7 @@ const getMissingBlobStorageIDs = async (db) => {
 };
 
 const getBlobStoreIDsWithBadCounts = async (db) => {
-  const blobStoreIDsWithBadCounts = await db.query('select BlobStorage.BlobStorageId from BlobStorage join BlobReferenceCount on BlobStorage.BlobStorageId = BlobReferenceCount.BlobStorageId where BlobStorage.BlobStorageId != BlobReferenceCount.BlobStorageId');
+  const blobStoreIDsWithBadCounts = await db.query('select BlobStorage.BlobStorageID from BlobStorage join BlobReferenceCount on BlobStorage.BlobStorageID = BlobReferenceCount.BlobStorageID where BlobStorage.NumReferences != BlobReferenceCount.NumReferences');
   return mapForBlobStorageID(blobStoreIDsWithBadCounts);
 };
 
